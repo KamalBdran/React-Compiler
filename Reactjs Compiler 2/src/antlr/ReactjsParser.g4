@@ -1,0 +1,93 @@
+parser grammar ReactjsParser;
+
+options { tokenVocab = ReactjsLexer; }
+
+program: declInt* declString* declBoolean* pureComponent* jsxComponent* EOF;
+
+pureComponent: CLASS componentName EXTENDS REACT_PURE_COMPONENT OPEN_CURLY_BRACKETS pureComponentBody CLOSE_CURLY_BRACKETS;
+
+jsxComponent: CONST componentName EQUALS OPEN_PARENTHSES PROPS? CLOSE_PARENTHSES ARROW OPEN_CURLY_BRACKETS componentBody CLOSE_CURLY_BRACKETS;
+
+pureComponentBody: RENDER OPEN_PARENTHSES CLOSE_PARENTHSES OPEN_CURLY_BRACKETS componentBody CLOSE_CURLY_BRACKETS;
+
+componentBody: ( declArray | declString | declInt | declBoolean | updateVarStringValue | updateVarIntValue | useState | useEffect |
+                 useRef | forLoop )* returnStatement;
+
+returnStatement: RETURN OPEN_PARENTHSES htmlEL CLOSE_PARENTHSES;
+
+htmlEL: OPEN_TAG ( ID | WORD_WITH_CAPITAL ) ( forAtt | normalAtt | propsAtt | varAtt )* ( ONCLICK EQUALS onClick )? CLOSE_TAG
+        ( forValue | htmlEL | ID | propsValue | varValue )* special* OPEN_TAG SLASH ( ID | WORD_WITH_CAPITAL ) CLOSE_TAG;
+
+componentName: WORD_WITH_CAPITAL;
+
+forAtt: ID EQUALS forValue;
+
+normalAtt: ID EQUALS attributeValue;
+
+propsAtt: ID EQUALS propsValue;
+
+varAtt: ID EQUALS OPEN_CURLY_BRACKETS ID CLOSE_CURLY_BRACKETS;
+
+onClick: OPEN_CURLY_BRACKETS OPEN_PARENTHSES CLOSE_PARENTHSES ARROW OPEN_CURLY_BRACKETS insideOnClick CLOSE_CURLY_BRACKETS CLOSE_CURLY_BRACKETS;
+
+insideOnClick: updateVarStringValue* toggle* | ID EQUALS ID ( PLUS | MINUS) NUMBER;
+
+forValue: OPEN_CURLY_BRACKETS forVar CLOSE_CURLY_BRACKETS;
+
+varValue: OPEN_CURLY_BRACKETS ID CLOSE_CURLY_BRACKETS;
+
+attributeValue: DOUBLE_QUOTES ID DOUBLE_QUOTES;
+
+propsValue: OPEN_CURLY_BRACKETS PROPS DOT ID CLOSE_CURLY_BRACKETS;
+
+updateVarStringValue: ID EQUALS ( ID | forVar );
+
+updateVarIntValue: ID EQUALS ( NUMBER | forVar );
+
+declString: ( VAR | CONST ) ID EQUALS ID;
+
+declInt: ( VAR | CONST ) ID EQUALS ( NUMBER | arrayLength );
+
+forVar: ID OPEN_SQUARE_BRACKETS ID CLOSE_SQUARE_BRACKETS DOT ID;
+
+arrayLength: ID DOT LENGTH;
+
+declBoolean: ( VAR | CONST ) ID EQUALS BOOLEAN;
+
+declArray: ( VAR | CONST ) ID EQUALS OPEN_SQUARE_BRACKETS CLOSE_SQUARE_BRACKETS;
+
+useState: CONST OPEN_SQUARE_BRACKETS ID COMMA ID CLOSE_SQUARE_BRACKETS EQUALS USESTATE OPEN_PARENTHSES ( boolState | numberState | stringState |
+          arrayState ) CLOSE_PARENTHSES;
+
+toggle: ID OPEN_PARENTHSES EX ID CLOSE_PARENTHSES;
+
+boolState: BOOLEAN;
+
+numberState: NUMBER;
+
+stringState: DOUBLE_QUOTES ID DOUBLE_QUOTES;
+
+arrayState: OPEN_SQUARE_BRACKETS object+ CLOSE_SQUARE_BRACKETS;
+
+object: OPEN_CURLY_BRACKETS ( stringObject | numObject )+ CLOSE_CURLY_BRACKETS COMMA;
+
+numObject: ID COLON NUMBER COMMA;
+
+stringObject: ID COLON DOUBLE_QUOTES ID DOUBLE_QUOTES COMMA;
+
+useEffect: USEEFFECT OPEN_PARENTHSES OPEN_PARENTHSES CLOSE_PARENTHSES ARROW OPEN_CURLY_BRACKETS insideUseEffect CLOSE_CURLY_BRACKETS CLOSE_PARENTHSES;
+
+insideUseEffect: ID;
+
+useRef: CONST ID EQUALS USEREF OPEN_PARENTHSES insideUseRef CLOSE_PARENTHSES;
+
+insideUseRef: NUMBER
+            | DOUBLE_QUOTES ID DOUBLE_QUOTES
+            ;
+
+forLoop: FOR OPEN_PARENTHSES VAR ID EQUALS NUMBER SIMICOLON ID OPEN_TAG ID SIMICOLON ID PLUS PLUS CLOSE_PARENTHSES
+         OPEN_CURLY_BRACKETS insideFor CLOSE_CURLY_BRACKETS;
+
+insideFor: ID? DOT? PUSH? OPEN_PARENTHSES? htmlEL CLOSE_PARENTHSES?;
+
+special: OPEN_CURLY_BRACKETS OPEN_PARENTHSES ID OR EX ID CLOSE_PARENTHSES AND htmlEL CLOSE_CURLY_BRACKETS;

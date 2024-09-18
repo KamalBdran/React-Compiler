@@ -1,0 +1,37 @@
+const App = () => {
+
+   const [products, setProducts] = useState([
+    { id: 1, name: "beauty", image:"imagesjpeg", description: "beauty", price: 22,},
+    { id: 2, name: "beauty", image:"downloadjpg", description: "beauty", price: 11,},
+  ])
+
+const prode = []
+  var dddddd = ff
+    var ppp = products
+var x = products.length
+    for (let i = 0; i < x; i++) {
+    prode.push(
+         <ProductDetails name={products[i].name}  image={products[i].image} price={products[i].price}></ProductDetails>
+    )
+  }
+
+  return (
+    <div>
+      <p>{ppp}</p>
+    </div>
+  )
+}
+
+
+const ProductDetails = (props) => {
+  return (
+    <div class="product">
+    <span class="productprice">{props.price}</span>
+            <p class="productname" onClick={() => {
+
+                                         }}>{props.name}</p>
+
+            <img class="productimage" src={props.image}></img>
+    </div>
+  )
+}
